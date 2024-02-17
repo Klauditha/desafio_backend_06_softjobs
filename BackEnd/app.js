@@ -7,11 +7,12 @@ const middleware = require('./middlewares/error.handler');
 app.use(cors());
 app.use(express.json());
 
-//error handler
-app.use(middleware.notFound);
-app.use(middleware.errorHandler);
 
 //routes
 app.use('/', routes);
+
+//error handler
+app.use(middleware.notFound);
+app.use(middleware.errorHandler);
 
 module.exports = app;

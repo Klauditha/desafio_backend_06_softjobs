@@ -2,16 +2,14 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const routes = require('./routes/index');
-
+const middleware = require('./middlewares/error.handler');
 //middleware
 app.use(cors());
-app.use(morgan('dev'));
 app.use(express.json());
 
 //error handler
-app.use((err, req, res, next) => {
-  res.status(500).send({ error: err.message });
-});
+app.use(middleware.notFound);
+app.use(middleware.errorHandler);
 
 //routes
 app.use('/', routes);

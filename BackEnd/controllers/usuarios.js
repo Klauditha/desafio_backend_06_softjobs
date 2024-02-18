@@ -1,4 +1,4 @@
-const { insertUsuario } = require('../querys/index');
+const { insertUsuario, getUsuarioByEmail } = require('../querys/index');
 const { pool } = require('../config/db');
 const bcrypt = require('bcryptjs');
 
@@ -37,13 +37,17 @@ const updateUsuario = (req, res) => {
 ///FAlTA VALIDAR SI EXISTE EL CORREO
 const createUsuario = async (req, res) => {
   const { email, lenguage, password, rol } = req.body;
-  console.log(email, lenguage, password, rol);
+  //console.log(email, lenguage, password, rol);
   try {
+    const query = await pool.query(getUsuarioByEmail(email));
+    const data = query.rows[0];
+    if (data) throw new Error('Email ya existe');
     await pool.query(
       insertUsuario(email, lenguage, bcrypt.hashSync(password, 10), rol)
     );
     res.status(200).send('Usuario creado');
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 };

@@ -16,7 +16,17 @@ router.post(
   ],
   usuariosController.createUsuario
 );
+
+router.post(
+  '/login',
+  [
+    check('email', 'El campo email es obligatorio').not().isEmpty(),
+    check('password', 'El campo password es obligatorio').not().isEmpty(),
+    validarCampos,
+  ],
+  usuariosController.loginUsuario
+);
+
 router.get('/usuarios', authMiddleware, usuariosController.getUsuario);
-router.post('/login', usuariosController.loginUsuario);
 
 module.exports = router;

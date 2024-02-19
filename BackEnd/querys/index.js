@@ -12,7 +12,6 @@ const insertUsuario = (email, lenguage, password, rol) => {
 };
 
 const getUsuarioByEmail = (email) => {
-  console.log(email);
   const query = format('SELECT * FROM usuarios WHERE email = %L', email);
   return query;
 };

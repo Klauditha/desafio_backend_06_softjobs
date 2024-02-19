@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+
 const { insertUsuario, getUsuarioByEmail } = require('../querys/index');
 const { pool } = require('../config/db');
 const bcrypt = require('bcryptjs');
@@ -34,14 +36,12 @@ const updateUsuario = (req, res) => {
   }
 };
 
-///FAlTA VALIDAR SI EXISTE EL CORREO
 const createUsuario = async (req, res) => {
   const { email, lenguage, password, rol } = req.body;
-  //console.log(email, lenguage, password, rol);
   try {
     const query = await pool.query(getUsuarioByEmail(email));
     const data = query.rows[0];
-    if (data) throw new Error('Email ya existe');
+    if (data) res.status(400).send('Email ya existe');
     await pool.query(
       insertUsuario(email, lenguage, bcrypt.hashSync(password, 10), rol)
     );
@@ -52,12 +52,30 @@ const createUsuario = async (req, res) => {
   }
 };
 
-const loginUsuario = (req, res) => {
+const loginUsuario = async (req, res) => {
+  const { email, password } = req.body;
+  console.log(email, password);
   try {
-    res.status(200).send('Listado de usuarios');
+    const query = await pool.query(getUsuarioByEmail(email));
+    const data = query.rows[0];
+    const isMatch = bcrypt.compareSync(password, data.password);
+    if (!isMatch) throw new Error('Credenciales incorrectas');
+    else {
+      const token = createPayload(data);
+      res.status(200).json({ token });
+    }
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
+};
+
+const createPayload = (user) => {
+  const payload = {
+    email: user.email,
+  };
+  const token = jwt.sign(payload, process.env.JWT_SECRET);
+  return token;
 };
 
 module.exports = {

@@ -4,35 +4,20 @@ const { insertUsuario, getUsuarioByEmail } = require('../querys/index');
 const { pool } = require('../config/db');
 const bcrypt = require('bcryptjs');
 
-const getAllUsuarios = (req, res) => {
+const getUsuario = async (req, res) => {
+  const email = req.email;
   try {
-    res.status(200).send('Listado de usuarios');
+    const query = await pool.query(getUsuarioByEmail(email));
+    const data = query.rows[0];
+    if (data) {
+      res.status(200).send(data);
+    }
+    else{
+      res.status(400).send('Email no existe');
+    }
   } catch (error) {
-    res.status(500).send(error);
-  }
-};
-
-const getUsuario = (req, res) => {
-  try {
-    res.status(200).send('Listado de usuarios');
-  } catch (error) {
-    res.status(500).send(error);
-  }
-};
-
-const deleteUsuario = (req, res) => {
-  try {
-    res.status(200).send('Listado de usuarios');
-  } catch (error) {
-    res.status(500).send(error);
-  }
-};
-
-const updateUsuario = (req, res) => {
-  try {
-    res.status(200).send('Listado de usuarios');
-  } catch (error) {
-    res.status(500).send(error);
+    console.log(error);
+    res.status(500).json(error);
   }
 };
 
@@ -79,10 +64,7 @@ const createPayload = (user) => {
 };
 
 module.exports = {
-  getAllUsuarios,
   getUsuario,
-  deleteUsuario,
-  updateUsuario,
   createUsuario,
   loginUsuario,
 };

@@ -3,12 +3,14 @@ require('dotenv').config();
 
 const authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
+  console.log(token)
   if (!token) {
     return res.status(401).json({ error: 'No token provided' });
   }
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = payload;
+    req.email = payload.email;
+    console.log("Verificado");
     next();
   } catch (error) {
     console.log(error);

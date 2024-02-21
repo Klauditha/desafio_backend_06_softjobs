@@ -2,7 +2,7 @@ const format = require('pg-format');
 
 const insertUsuario = (email, lenguage, password, rol) => {
   const query = format(
-    'INSERT INTO usuarios (email, lenguage, password, rol) VALUES (%L, %L, %L, %L)',
+    'INSERT INTO usuarios (email, lenguage, password, rol) VALUES (%L, %L, %L, %L) RETURNING *',
     email,
     lenguage,
     password,

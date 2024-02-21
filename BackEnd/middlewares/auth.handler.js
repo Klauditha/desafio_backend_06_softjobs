@@ -3,18 +3,22 @@ require('dotenv').config();
 
 const authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
-  console.log(token)
+  console.log(token);
   if (!token) {
     return res.status(401).json({ error: 'No token provided' });
   }
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     req.email = payload.email;
-    console.log("Verificado");
     next();
   } catch (error) {
-    console.log(error);
-    return res.status(401).send({ error: 'Invalid token' });
+    if (error instanceof jwt.TokenExpiredError) {
+      return res.status(401).send({ error: 'Token ha expirado' });
+    } else if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(401).send({ error: 'Token o firma no válida' });
+    } else {
+      return res.status(401).send({ error: 'Token no válido' });
+    }
   }
 };
 
